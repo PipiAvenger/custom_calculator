@@ -428,7 +428,17 @@ https://www.bing.com/search?q=json.dumps+%e4%b8%ad%e6%96%87&qs=MT&pq=json.dumps&
 追加了程序的默认图标
 https://blog.csdn.net/djstavaV/article/details/105741016
 
-TODO 代码打包成exe
-TODO git管理本工具代码
+2024/10/10
+完成同步代码到git
+使用ide的git工具进行提交
+https://blog.csdn.net/zhaiyujia15195383763/article/details/87773771
+使用pyinstaller打包exe
+https://blog.csdn.net/libaineu2004/article/details/112612421
+执行命令
+pyinstaller --onefile --windowed --icon=favicon.ico --distpath=./bin custom_calculator.py
+完善项目相关信息的构建
+TODO python需要的库文件信息记录requirements.txt
+TODO README.md
+
 TODO 每次点击程序启动以及点击历史账单按钮都会弹出一个框然后关闭，时间很短，看能不能找出原因（暂时找不到）
 

@@ -27,7 +27,7 @@ INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VAL
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (2, '水费', '58.8', 'public', 0);
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (3, '垃圾清运费', '0', 'public', 0);
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (4, '电费单价', '0.699', 'public', 0);
-INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (5, '总计用电度数', '6', 'public-ex', 0);
+INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (5, '总计用电度数', '6', 'public', 0);
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (6, '上月用电度数', '0', 'public-ex', 0);
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (7, '本月用电度数', '1', 'public-ex', 0);
 INSERT INTO calculator_config (id, key_name, key_value, key_type, parent_id) VALUES (8, '公摊电费', '0', 'public', 0);
