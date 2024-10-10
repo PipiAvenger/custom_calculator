@@ -1,0 +1,434 @@
+
+pyqt居中显示窗口
+        # 布局
+        # 设置窗口大小为屏幕的60%
+        screen = QApplication.primaryScreen().size()
+        width = int(screen.width() * 0.6)
+        height = int(screen.height() * 0.6)
+        self.resize(width, height)
+
+        # 居中显示窗口
+        self.setGeometry(
+            (screen.width() - width) // 2,
+            (screen.height() - height) // 2,
+            width, height
+        )
+
+2024/09/10
+纠正一下我的需求，程序页面布局规划如下：
+主程序的进程名称为账单计算器;
+主程序包含2个页面分别是账单计算页面和历史账单页面，它们分别通过点击"账单计算"按钮或"历史账单"按钮切换，默认显示"账单计算"页面。
+以下的每个空间包括子空间都使用线进行框定，账单计算的页面规划如下:
+点击"账单计算"按钮之后，将展示一个叫"账单计算空间“的空间，该空间下有”单独项计费空间“子空间、"公共项计费空间"子空间、"费用结算空间"子空间和一个”计算“按钮。
+子空间"单独项计费空间"有"名称"子空间和"单项费用"子空间，其中"名称"子空间和"单项费用"子空间从上往下在"单独项计费空间"排列，"名称"子空间为靠左显示，"单项费用"子空间有5个名叫"项"分布均匀的子空间。
+以下内容暂时为空:
+公共项计费空间;
+费用结算空间;
+历史账单空间;
+
+2024/09/11
+1.使用面板来替代或这圆弧来替代矩形线条
+https://blog.csdn.net/weixin_43496130/article/details/104242882
+2.账单计算和历史账单页左边对齐--改为居中
+https://blog.csdn.net/jia666666/article/details/81700508
+3.使用函数整理账单流程? -- 完成
+4.单独项计费栏和其他子空间的空间占比大致在1:4
+5.单项费用这个也是一个box，在box中进行纵向排列输入框，需要用到QVBoxLayout类并函数化
+6.将一个单项收费设计成抽象类，以供后续代码调用，类的样式是由多个名称栏+输入栏为一组的组组成，需要存储值
+7.拓展：有没有类似可视化pyqt代码对应样式设计的网站，可以支持用条形来展示代码所表述的样式
+
+代码框架:
+- pyQt5
+
+实现功能:
+- 主空间下
+
+代码风格:
+尽量使用对象思维将功能封装成对象实现上述功能
+
+2024/09/12
+Qt的界面的一些术语布局、样式、控件
+熟悉了以下的一些知识点
+QWidget(窗口基类)
+https://blog.csdn.net/huayunhualuo/article/details/100623322
+
+QFrame(样式)
+https://blog.csdn.net/weixin_43496130/article/details/104242882
+
+QVBoxLayout(布局)
+https://blog.csdn.net/jia666666/article/details/81700508
+
+QVBoxLayout(布局) && QVBoxLayout(布局)
+https://blog.csdn.net/Oh_Python/article/details/134791411
+
+QHBoxLayout(布局)
+https://blog.csdn.net/jia666666/article/details/81699900
+
+button(控件)这几个UI类
+继续完成09/11需要完成的内容，同时认清现实，先把这个工具demo设计出来，看出一个大概之后再考虑6和7点
+
+2024/09/13
+1.将昨天学的知识熟悉，并应用到计算结果的界面上 ✔
+2.熟悉button关联信号功能
+https://blog.csdn.net/weixin_53989417/article/details/128941319
+
+遇到了个BUG
+pyqt进程启动后自动推出，并有错误代码0xC000409
+1.pycharm开启终端窗口调试
+https://blog.csdn.net/qq_28077617/article/details/119386664
+2.开启后再次调试会提示错误信息
+https://blog.csdn.net/oracleworm/article/details/129869071
+
+3.思考并找到框框数据如何映射到对象内部以供使用
+- 在设计之时没有看到有对空间进行标识的一个过程，因此最原始的办法就是另外用对象的变量进行存储
+- 其他可能？先查看以下
+今天先把思路捋一下，然后下周回来建立关系
+
+设定以下需求框架
+1.可增加、删除用户的数量，调整为启用或者禁用，因为目前确实是只有5个房间不多也不少，只会出现是否有人入住而已。
+2.可动态添加单项计费，公共项计费
+3.计算方式先写死，不向用户提供计算方式（目前这个很模糊，而且想了很多发现都在浪费时间，不如暂时不要纠结，把demo做出来先）
+
+单独项这块设计：
+支持增加、删除用户数（待了解实现方法）
+一个用户时必须输入以下内容：
+- 姓名
+- 本月用电数
+- 本月用电数
+- 是否启用
+
+×- 支持可额外添加项（用于对个人算收费时用的，目前这个场景比较少见，暂不实现）
+程序启动时支持读取上次的数据进行预填充
+每计算一次数据就同步保存一次
+
+公共费用项
+支持增加、删除项
+程序启动时支持读取上次的数据进行预填充
+每计算一次数据就同步保存一次
+
+数据存储结构
+all_data_info
+type: dict
+
+key:individual_info
+key:public_info
+key:result_info
+
+- 单项计费
+'individual': [dict1, dict2, ...]
+dict1:
+-- '姓名'
+-- '上月用电度数'
+-- '本月用电度数'
+
+- 公共项
+type:dict
+
+这里需要动态支持添加key value
+
+- 结果
+result_info
+list[dict1, dict2, ...]
+
+存储数据表数据
+sqlite用来存储配置数据
+table_name:calculator_config
+key:
+- id bigint
+- key_name string
+- key_value double
+- whois string
+
+sql语句列举
+更改房间名
+update calculator_config set whois = '' where whois = 'xxx';
+更改公摊数据
+update calculator_config set key_value = xxx where key_name = 'xxx' and whois = 'public';
+更改房间名下的对应的字段值
+update calculator_config set key_value = xxx where key_name = '上月用电度数' and whois = '房间1:林';
+新增公共项
+insert into calculator_config (key_name, key_value, whois) values ('垃圾清运费', xxx, 'public');
+删除公共项
+delete from calculator_config where key_name = 'xxx' and whois = 'xxx';
+现在遇到的问题是，用户在更新键值对栏时，因键值对抽象类没有建立层级关系，无法准确更新数据库对应的键值对
+解决办法:
+1.在键值对像中新增一个属性来存储层级关系(使用数据库的自增id作为主键，这样更新都能直接定位到是哪个数据需要更新)
+2.将计算处理的实例传入提供一个回调函数，由实例去统一查关系并更新
+必须异步处理同步用户输入的数据到数据库里头
+
+sqlite用来存储每月的总费用
+table_name: calculator_history
+历史数据表存储字段设计
+key
+- id bigint 主键自增id
+- last_month_use int
+- this_month_use int
+- power_rate double
+- public_fee double
+- total_fee double
+- whois string
+create_date Date(xxxx/xx精确到年月即可数据展示查询可通过日期查询即可)
+
+
+2024/09/18
+需要一个标志来标识是否calculator_config下的项是不可删除，命名为key_type
+数据存储关系
+pycharm + Qt Designer
+https://blog.csdn.net/stone0823/article/details/104101130
+
+进程启动顺序规划
+程序初始化(预配置数据库，仅需要进行一次)
+1.启动数据库并连接
+2.读取数据库数据
+3.初始化应用界面
+4.开始计算
+5.界面切换使用
+
+经过思考决定调整calculator_config表字段，原因为不满足如下实际需求
+1.没有类型进行区分
+2.建立的父子关系模糊太过随意
+新表情况如下
+CREATE TABLE IF NOT EXISTS calculator_config (
+    id BIGINT PRIMARY KEY,
+    key_name TEXT NOT NULL,
+    key_value TEXT NOT NULL,
+    key_type TEXT Not NULL,
+    parent_id BIGINT DEFAULT 0,
+);
+说明:
+key_type为类型区分字段，考虑到用数字还需要建立映射因此走简单化直接字符串来标识即可
+parent_id为父id 用来标识键值对之间关系
+
+数据加载时
+将数据表中数据加载并建立缓存
+对缓存的数据进行创建对应窗口
+关系维护，目前不做房间增删情况是不需要的
+
+触发修改时调用回调创建任务
+任务队列
+
+进程目录
+bin
+- xxx.exe
+
+log
+- xxx.log
+
+database
+- xxx.database
+- xxx.sql
+
+2024/09/19
+事项
+1.设置默认日志编码格式为utf-8
+2.代码功能调试
+3.pycharm下使用sqlite3(还不够优雅)
+https://blog.csdn.net/Adorable_queen/article/details/132481502
+https://blog.csdn.net/winfred_hua/article/details/85156750
+4.queue的使用回顾
+https://blog.csdn.net/weixin_47071532/article/details/132802439
+5.给qt.QlineEdit.connect槽函数添加函数传参
+https://blog.csdn.net/wuShiJingZuo/article/details/135018810暂未验证
+
+
+2024/09/20
+完成2024/09/19遗留下的事项
+完成计算部分的代码和功能
+结果的格式
+{
+"room": [{}],
+"pub": {
+
+“键”: "值"
+
+}
+}
+
+
+2024/09.23
+
+这段代码确实实现了对已有的布局进行清除，但在设置新布局时出现了问题，新的布局并没有如期展示，我的功能是通过点击按钮对已有的布局self.calculate_result_page布局进行更新对应的内容，目前我的伪代码实现如下：
+class A(Qwidget):
+def __init__():
+        # 计算按钮
+        bill_layout.addWidget(self.create_calculator_push_button_page())
+
+    def create_calculator_push_button_page(self):
+        """
+        按钮布局
+        :return: page
+        """
+        page = QFrame()
+        button_space = QHBoxLayout()
+        button_space.addStretch(0)
+        self.culator_button = QPushButton('计算')
+        self.culator_button.clicked.connect(self.update_bill_calculator_result_page)
+
+        page.setLayout(button_space)
+
+        return page
+
+    def init_bill_calculator_page(self):
+        """
+        创建账单信息计算结果
+        :return: page
+        """
+        self.calculate_result_page = QFrame()
+        self.calculate_result_page.setFrameShape(QFrame.Panel)
+        self.calculate_result_page.setFrameShadow(QFrame.Raised)
+        self.calculate_result_page.setLineWidth(2)
+
+        return self.calculate_result_page
+
+    def update_bill_calculator_result_page(self):
+        update_layout = QVBoxLayout()
+        ...
+        # 清除已有的布局
+        old_layout = self.calculate_result_page.layout()
+        self.clean_layout(old_layout)
+
+        # 更新计算结果的页面
+        self.calculate_result_page.setLayout(update_layout)
+
+    def clean_layout(self, layout):
+        if layout is None:
+            return
+
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()  # 安全删除小部件
+            elif item.layout():  # 如果有子布局，递归清除
+                self.clean_layout(item.layout())
+请帮忙排查一下没有更新成最新页面的这部分代码
+
+def update_bill_calculator_result_page(self):
+    update_layout = QVBoxLayout()
+
+    logger.info('用户触发计算')
+
+    # 结果计算
+    self.calculator_result = self.calculate()
+
+    # 结果空间一栏
+    # 标题
+    # 名称一栏
+    now_date = datetime.datetime.now()
+    formatted_date = now_date.strftime('%Y-%m')
+    update_layout.addWidget(QLabel(f'{formatted_date}月费用统计情况'))
+
+# room
+    room_list = self.calculator_result['room']
+    rooms_layout = QHBoxLayout()
+    for room in room_list:
+        rooms_layout.addWidget(
+            BaseVItem.trans_dict_2_qt_frame_1(
+                room, QFrame()
+            )
+        )
+    update_layout.addLayout(rooms_layout)
+
+    # 备注说明栏
+    note = '注：'
+    public_info = self.calculator_result['public']
+    note += "，".join(f'{_k}：{_v}' for _k, _v in public_info.items())
+    update_layout.addWidget(QLabel(note))
+    # 公摊栏详情
+    note = '公摊详情：'
+    public_ex_info = self.calculator_result['public-ex']
+    note += "，".join(f'{_k}：{_v}' for _k, _v in public_ex_info.items())
+    update_layout.addWidget(QLabel(note))
+
+    logger.info('计算结果完成')
+
+    # 清除已有的布局
+    old_layout = self.calculate_result_page.layout()
+    self.clean_layout(old_layout)
+
+    # 更新计算结果的页面
+    self.calculate_result_page.setLayout(update_layout)
+    self.calculate_result_page.update()
+
+def clean_layout(self, layout):
+    if layout is None:
+        return
+
+    while layout.count():
+        item = layout.takeAt(0)
+        widget = item.widget()
+        if widget:
+            widget.deleteLater()  # 安全删除小部件
+        elif item.layout():  # 如果有子布局，递归清除
+            self.clean_layout(item.layout())
+
+    # layout.deleteLater()
+计算数据只展示一次的问题
+解决的方法途径有2个：
+1.对对象布局进行删除后重新设置布局（搜索资料的过程没有找到官方提供的接口函数，大部分的教程案例以及AI回答的都是删除）
+2.采用QstackedLayout来实现按钮切换的功能（采用该方法实现）
+
+方法1的过程遇到了很多问题，询问了ai和google最终发现要想实现我要的效果就最好采用方法2
+
+其中在使用方法2的过程中遇到了以下问题并解决
+- 使用和关联按钮流程
+https://blog.csdn.net/wowocpp/article/details/105228300
+- QstackedLayout布局通过删除、增加和设置的形式更新页面布局
+实现某个区块通过按钮的形式实时更新想要的布局和页面
+
+QPushButton.clicked.connect()的静态回调和动态回调（涉及页面布局是静态更新还是动态更新）
+qt还是要看看的
+
+2024/09/29
+历史表数据的展示暂时考虑为展示2个区块
+- 最近6个月房间总支出情况，并用折线图展现
+- 可选展示各个房间6个月的费用情况，并用折线图展现
+已实现折线图的实例并封装了函数，准备将其运用到计算器代码中
+
+2024/09/29
+- 编写完代码并测通对应的代码
+
+
+
+callback_dict {
+ 'title1': func_back1,
+ 'title2': func_back2
+}
+
+func_back()
+return self.call_back_dict['title']
+
+->func_back1
+
+public.update1()
+public.update2()
+
+
+
+
+2024/10/08遇到一个逻辑问题
+历史表的页面通过历史账单按钮切换过来的，而历史表的页面为了在QstackLayout中添加提前初始化好了，这就会出现一个问题就是当用户点击账单页面中的计算生成结果后
+历史账单查询的数据中的总价格仍然为旧数据而不含有最新数据
+1.通过点击历史账单按钮也能去更新历史账单的各项数据
+2.原先的进行赋值为空，等点了触发之后再创建获取
+3.使用最暴力的办法，删除覆盖(✔)
+会遇到一个警告打印
+【matplotlib】 之 RuntimeWarning: More than 20 figures have been opened.
+https://blog.csdn.net/tz_zs/article/details/81385427
+
+matplotlib DEBUG打印信息过多
+https://blog.csdn.net/qq_25368751/article/details/129920381#:~:text=%E5%9C%A8Python%E7%9A%84%E7%A7%91%E5%AD%A6
+
+友好的在打印界面输出python字典内容并可以使用json序列化美化以及输出编码问题
+
+https://www.bing.com/search?q=json.dumps+%e4%b8%ad%e6%96%87&qs=MT&pq=json.dumps&sc=10-10&cvid=4E8EA99C13184F2EA894A31F203793DF&FORM=QBRE&sp=1&lq=0
+
+2024/10/09
+完成个人历史账单查询布局以及完成历史总账单布局功能调试
+追加了程序的默认图标
+https://blog.csdn.net/djstavaV/article/details/105741016
+
+TODO 代码打包成exe
+TODO git管理本工具代码
+TODO 每次点击程序启动以及点击历史账单按钮都会弹出一个框然后关闭，时间很短，看能不能找出原因（暂时找不到）
+
