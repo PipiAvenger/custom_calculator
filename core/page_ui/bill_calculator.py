@@ -163,13 +163,11 @@ class BillCalculator(QMainWindow):
         # 页面容器
         self.pages = QStackedLayout()
         self.bill_calculator_page = self.create_bill_calculator_page()
-        # self.history_page = self.create_history_page()
 
         self.pages.addWidget(self.bill_calculator_page)
 
         # 默认显示账单计算页面（这里的写法是2个静态页面布局）
         self.calc_button.clicked.connect(lambda: self.pages.setCurrentWidget(self.bill_calculator_page))
-        # self.history_button.clicked.connect(lambda: self.pages.setCurrentWidget(self.history_page))
         # 动态加载历史账单数据
         self.history_button.clicked.connect(self.update_history_page)
 
@@ -614,7 +612,11 @@ class BillCalculator(QMainWindow):
         )
         self.history_summary_combo_box.setCurrentIndex(0)
         name_label_layout.addWidget(self.history_summary_combo_box)
-        name_label_layout.addStretch()
+        name_label_layout.setStretch(0, 3)
+        name_label_layout.setStretch(1, 3)
+        name_label_layout.addStretch(5)
+        name_label_layout.addStretch(5)
+        name_label_layout.addStretch(5)
         page_layout.addLayout(name_label_layout)
         # 历史房间总统计
         self.history_summary_combo_box_layout = QStackedLayout()
@@ -665,7 +667,7 @@ class BillCalculator(QMainWindow):
         self.summary_line_graph_frame = build_line_graph(
             '最近6个月房间总支出',
             '月份',
-            '金额',
+            '金额/元',
             show_data
         )
 
@@ -678,7 +680,7 @@ class BillCalculator(QMainWindow):
         self.average_line_graph_frame = build_line_graph(
             '最近6个月平均均摊',
             '月份',
-            '金额',
+            '金额/元',
             show_data
         )
 
@@ -691,7 +693,7 @@ class BillCalculator(QMainWindow):
         page.setLineWidth(2)
         page_layout = QVBoxLayout()
         name_label_layout = QHBoxLayout()
-        label = QLabel('每个房间最近6个月的费用情况')
+        label = QLabel('最近6个月每个房间的费用情况')
         name_label_layout.addWidget(label)
 
         months = get_last_6_months()
@@ -704,7 +706,11 @@ class BillCalculator(QMainWindow):
         )
         self.rooms_combo_box.setCurrentIndex(0)
         name_label_layout.addWidget(self.rooms_combo_box)
-        name_label_layout.addStretch()
+        name_label_layout.setStretch(0, 3)
+        name_label_layout.setStretch(1, 3)
+        name_label_layout.addStretch(5)
+        name_label_layout.addStretch(5)
+        name_label_layout.addStretch(5)
         page_layout.addLayout(name_label_layout)
         # 个人房间信息
         self.rooms_combo_box_layout = QStackedLayout()
@@ -715,7 +721,7 @@ class BillCalculator(QMainWindow):
                 room
             )
             line_graph_page = build_line_graph(
-                    '每月费用图', '月份','金额',
+                    '每月费用图', '月份','金额/元',
                     one_room_record
                 )
             self.rooms[room] = line_graph_page

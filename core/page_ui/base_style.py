@@ -27,6 +27,9 @@ class BaseVItem(QFrame):
         one_item = QHBoxLayout()
         one_item.addWidget(self.key_name)
         one_item.addWidget(self.key_value)
+        # 伸缩比5:4
+        one_item.setStretch(0, 5)
+        one_item.setStretch(1, 4)
         self.setLayout(one_item)
 
     def set_QLineEdit_callback(self, obj: object):
