@@ -425,6 +425,12 @@ class BillCalculator(QMainWindow):
         data_info.pop(_per_electricity['id'])
         per_electricity = float(_per_electricity['key_value'])
         public_info[_per_electricity['key_name']] = _per_electricity['key_value']
+        # 公共总用电数
+        __pub_use_total_ele = list(filter(lambda item: item['key_name'].find('总计') != -1, data_info.values()))
+        _pub_use_total_ele = __pub_use_total_ele.pop(0)
+        data_info.pop(_pub_use_total_ele['id'])
+        pub_use_total_ele = float(_pub_use_total_ele['key_value'])
+        public_info[_pub_use_total_ele['key_name']] = _pub_use_total_ele['key_value']
 
         # 公共费用处理
         __public_items = list(filter(lambda item: item['key_type'] == 'public', data_info.values()))
@@ -433,15 +439,10 @@ class BillCalculator(QMainWindow):
             public_fee += float(_public_item['key_value'])
             public_info[_public_item['key_name']] = _public_item['key_value']
         result_info['public'] = public_info
-
         public_ex_info = dict()
         # 公共用电取值
         __pub_use_electricity = list(filter(lambda item: item['key_type'] == 'public-ex', data_info.values()))
-        # 公共总用电数
-        __pub_use_total_ele = list(filter(lambda item: item['key_name'].find('总计') != -1, __pub_use_electricity))
-        _pub_use_total_ele = __pub_use_total_ele.pop(0)
-        pub_use_total_ele = float(_pub_use_total_ele['key_value'])
-        public_info[_pub_use_total_ele['key_name']] = _pub_use_total_ele['key_value']
+
         # 公共上月用电数
         __pub_use_last_ele = list(filter(lambda item: item['key_name'].find('上月') != -1, __pub_use_electricity))
         _pub_use_last_ele = __pub_use_last_ele.pop(0)
@@ -499,7 +500,7 @@ class BillCalculator(QMainWindow):
 
         #平摊价格
         if room_num != 0:
-            share_fee = (share_equally_power + public_fee) / room_num
+            share_fee = (share_equally_power + public_fee + per_electricity * (pub_use_now_ele - pub_use_last_ele) ) / room_num
         else:
             share_fee = 0
 
@@ -513,13 +514,13 @@ class BillCalculator(QMainWindow):
             one_room_result['公摊费用'] = format(share_fee, '.3f')
             person_ele_fee = one_room_result['个人电费']
             one_room_result['个人电费'] = format(person_ele_fee, '.3f')
-            one_room_result['总计费用'] = format(share_fee + person_ele_fee, '.3f')
+            one_room_result['总计费用'] = format(share_fee + person_ele_fee, '.2f')
             total_fee += share_fee + person_ele_fee
         result_info['room'] = room_result_list
 
         # 合计
-        public_info['总费用合计'] = format(total_fee, '.3f')
-        public_ex_info['公摊费用'] = share_fee
+        public_info['总费用合计'] = format(total_fee, '.2f')
+        public_ex_info['公摊费用'] = format(share_fee, '.3f')
         logger.debug(f'计算结果如下:{json.dumps(result_info, ensure_ascii=False)}')
         return result_info
 
