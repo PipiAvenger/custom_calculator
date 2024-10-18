@@ -33,3 +33,8 @@ pyinstaller --onefile --windowed --icon=favicon.ico --distpath=./bin custom_calc
 注：除房间名对应的输入框可以输入非数字文本以外其他输入框请不要输入非数字相关的文本
 
 
+### 程序界面预览
+<image src="./img/计算页面.png" align="middle"><p align="middle">计算界面</p></image>
+
+<image src="./img/历史数据页面.png"><p align="middle">历史数据页面</p></image>
+
